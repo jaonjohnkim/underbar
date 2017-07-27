@@ -481,12 +481,17 @@
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var overlap = _.intersection.apply(this, arguments);
-    console.log(JSON.stringify(overlap));
     var sameArr = array.slice();
-    for (var i = 0; i < overlap.length; i++){
-      var indexOverlap = _.indexOf(array, overlap[i]);
-      sameArr.splice(indexOverlap, 1);
+    var overlap = [];
+    for (var i = 1; i < arguments.length; i++) {
+      for (var j = 0; j < sameArr.length; j++) {
+        for (var k = 0; k < arguments[i].length; k++) {
+          if (sameArr[j] === arguments[i][k]) {
+            sameArr.splice(j, 1);
+            j--;
+          }
+        }
+      }
     }
     return sameArr;
   };
@@ -497,5 +502,13 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+    var timeout = false;
+    setTimeout(function(){
+      timeout = true;
+    }, 100);
+
+    if (timeout) {
+
+    }
   };
 }());
