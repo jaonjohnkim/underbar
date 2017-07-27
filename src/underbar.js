@@ -502,13 +502,40 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
-    var timeout = false;
-    setTimeout(function(){
-      timeout = true;
-    }, 100);
+    //set closure variable
+    //return function
+      //if first time
+        //start timer
+        //execute function
+      //else
+        // get current time
+        // if current time exceeds or equals timer + wait
+          //reset the timer
+          //execute function
+      //end
+    var timer;
 
-    if (timeout) {
-
+    return function () {
+      if (timer === undefined) {
+        console.log('First time fn runs');
+        timer = new Date();
+        timer = timer.getSeconds()*1000 + timer.getMilliseconds();
+        func.apply(this, arguments);
+      } else {
+        // console.log('After first time fn runs');
+        var current = new Date();
+        current = current.getSeconds()*1000 + current.getMilliseconds();
+        console.log('Current time: ' + current);
+        console.log('Start time: ' + timer);
+        console.log('Minimum wait time: ' + (timer + wait));
+        if (current >= (timer + wait)) {
+          console.log('RAN!')
+          timer = current;
+          func.apply(this, arguments);
+        }
+      }
     }
+
+
   };
 }());

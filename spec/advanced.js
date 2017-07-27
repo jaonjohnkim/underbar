@@ -160,16 +160,21 @@
         _.throttle(callback, 100)
       });
 
-      it('should return a function callable twice in the first 200ms', function() {
+      it('should return a function callable 5 times in the first 1000ms', function() {
         var fn = _.throttle(callback, 100);
         fn(); // called
         setTimeout(fn, 50);
         setTimeout(fn, 100); // called
         setTimeout(fn, 150);
         setTimeout(fn, 199);
-        clock.tick(200);
+        setTimeout(fn, 200); // called 3
+        setTimeout(fn, 900); // called 4
+        setTimeout(fn, 999);
+        setTimeout(fn, 1000); // called 5
 
-        expect(callback).to.have.been.calledTwice;
+        clock.tick(1000);
+
+        expect(callback).to.have.been.callCount(5);
       });
 
     });
