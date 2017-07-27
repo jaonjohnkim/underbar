@@ -373,6 +373,15 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+
+    var newCollection = _.map(collection, function(value){
+      if (value[functionOrKey] !== undefined){
+        return value[functionOrKey]();
+      }
+      return functionOrKey.apply(value);
+    });
+
+    return newCollection;
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -380,6 +389,23 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    return collection.sort(function(a, b) {
+      if (a[iterator] !== undefined){
+        var criteriaA = a[iterator];
+        var criteriaB = b[iterator];
+      } else {
+        var criteriaA = iterator(a);
+        var criteriaB = iterator(b);
+      }
+
+      if (criteriaA < criteriaB) {
+        return -1;
+      }
+      if (criteriaA > criteriaB) {
+        return 1;
+      }
+      return 0;
+    });
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -388,6 +414,23 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var array = [];
+    var longestArrLength = 0;
+
+    for (var k = 0; k < arguments.length; k++) {
+      if (arguments[k].length > longestArrLength){
+        longestArrLength = arguments[k].length;
+      }
+    }
+
+    for (var i = 0; i < longestArrLength; i++){
+      var newArr = [];
+      for (var j = 0; j < arguments.length; j++) {
+        newArr.push(arguments[j][i]);
+      }
+      array.push(newArr);
+    }
+    return array;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -395,16 +438,57 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var array = [];
+    for (var i = 0; i < nestedArray.length; i++){
+      if (Array.isArray(nestedArray[i])){
+        var values = _.flatten(nestedArray[i]); //I'm super proud of this!!
+        array = array.concat(values);
+      } else {
+        array.push(nestedArray[i]);
+      }
+    }
+
+    return array;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    var intersect = [];
+    var firstArr = arguments[0];
+    var secondArr = arguments[1];
+
+    for (var j = 0; j < firstArr.length; j++) {
+      for (var k = 0; k < secondArr.length; k++) {
+        if (firstArr[j] === secondArr[k]){
+          intersect.push(firstArr[j]);
+        }
+      }
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      for (var a = 0; a < arguments[i].length; a++) {
+        for (var b = 0; b < intersect.length; b++) {
+          if (intersect[b] !== arguments[i][a]){
+            intersect.splice(b, 1);
+            b--;
+          }
+        }
+      }
+    }
+    return intersect;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var overlap = _.intersection.apply(this, arguments);
+    console.log(JSON.stringify(overlap));
+    var sameArr = array.slice();
+    for (var i = 0; i < overlap.length; i++){
+      var indexOverlap = _.indexOf(array, overlap[i]);
+      sameArr.splice(indexOverlap, 1);
+    }
+    return sameArr;
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
